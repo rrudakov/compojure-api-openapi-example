@@ -3,6 +3,7 @@
             openapi-example.coercion
             [openapi-example.openapi :refer [openapi-routes]]
             [openapi-example.spec :as spec]
+            [ring.middleware.multipart-params :as mw]
             [ring.util.http-response :refer [ok]]))
 
 (def app
@@ -30,4 +31,11 @@
        :summary "echoes a Pizza"
        :responses {200 {:description "Successful!"
                         :schema ::spec/pizza}}
-       (ok pizza)))))
+       (ok pizza))
+
+     (POST "/upload" []
+       :multipart-params [file :- ::spec/file]
+       :middleware [mw/wrap-multipart-params]
+       :responses {200 {:description "File uploaded"
+                        :schema ::spec/file-response}}
+       (ok (dissoc file :tempfile))))))
